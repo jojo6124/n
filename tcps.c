@@ -24,7 +24,7 @@ void func(int connfd){
 		
 		//Reading client message using client socket descriptor i.e connfd
 		read(connfd, buff, sizeof(buff));
-		printf("From client: %s\nTo client:",buff);
+		printf("Client: %s\nServer: ",buff);
 		
 		
 		//Write
@@ -33,15 +33,16 @@ void func(int connfd){
 		//We use while loop with getchar() to read sentences with spaces
 		while( (buff[n++] = getchar()) != '\n');
 		
+		//Sending message to client
+		write(connfd, buff, sizeof(buff));
+		
+		
 		//Put buff in an if statement to exit if it ever writes 'exit'
-		if(strcmpi("exit", buff , 4) == 0){
+		if(strncmp("exit", buff , 4) == 0){
 			printf("Server exiting...\n");
 			break;
 		}
-		else
-			write(sockfd, buff, sizeof(buff))
-	}
-	
+	}	
 }
 
 int main(){
@@ -55,6 +56,9 @@ int main(){
 	
 	//Create Socket
 	sockfd = socket(AF_INET, SOCK_STREAM, 0);//Using SOCK_STREAM for TCP stream, AF_INET for communication with diffrent machines, No extra protocol
+	
+	bzero(&serv, sizeof(serv));
+
 	
 	//Assigning address of server to 'serv'
 	serv.sin_family = AF_INET;
@@ -81,8 +85,9 @@ int main(){
 	
 	
 	//Accept
+	len = sizeof(cli);
 	//Store client info in 'cli' using accept
-	connfd = accept(sockfd, (SA*)&cli, sizeof(cli));
+	connfd = accept(sockfd, (SA*)&cli, &len);
 	if (connfd < 0) {
 		printf("server accept failed...\n");
 		exit(0);
@@ -95,4 +100,6 @@ int main(){
 	
 	//Close connection
 	close(sockfd);
+	
+	return 0;
 }
